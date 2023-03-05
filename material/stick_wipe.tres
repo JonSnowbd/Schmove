@@ -1,0 +1,8 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://gckh4scatjgw"]
+
+[ext_resource type="Shader" path="res://addons/schmove/shader/stick_wipe.gdshader" id="1_vowam"]
+
+[resource]
+shader = ExtResource("1_vowam")
+shader_parameter/progress = 0.0
+shader_parameter/blackout = Vector4(0, 0, 0, 1)

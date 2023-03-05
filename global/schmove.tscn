@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3 uid="uid://bleubrjumj4lx"]
+
+[ext_resource type="Script" path="res://addons/schmove/global/schmove_curtain.gd" id="1_0q8sp"]
+[ext_resource type="Script" path="res://addons/schmove/global/schmove.gd" id="1_cts71"]
+[ext_resource type="Material" uid="uid://x6mnmtvnnibs" path="res://addons/schmove/material/circle_wipe.tres" id="3_q6uq0"]
+[ext_resource type="Texture2D" uid="uid://c367ypsq88hl0" path="res://icon.svg" id="3_woa4k"]
+
+[node name="schmove" type="Node"]
+script = ExtResource("1_cts71")
+
+[node name="Curtain" type="CanvasLayer" parent="."]
+layer = 128
+visible = false
+script = ExtResource("1_0q8sp")
+
+[node name="TextureRect" type="TextureRect" parent="Curtain"]
+texture_repeat = 3
+material = ExtResource("3_q6uq0")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_woa4k")

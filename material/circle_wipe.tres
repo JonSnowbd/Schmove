@@ -1,0 +1,8 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://x6mnmtvnnibs"]
+
+[ext_resource type="Shader" path="res://addons/schmove/shader/circle_wipe.gdshader" id="1_6bg7f"]
+
+[resource]
+shader = ExtResource("1_6bg7f")
+shader_parameter/progress = 0.0
+shader_parameter/blackout = Vector4(0.08, 0.08, 0.08, 1)

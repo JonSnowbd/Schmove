@@ -1,0 +1,82 @@
+[gd_scene load_steps=3 format=3 uid="uid://bwhhqrhm3x7k6"]
+
+[ext_resource type="Script" path="res://addons/schmove/debugger.gd" id="1_tpm4m"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_n3e6v"]
+font_size = 10
+
+[node name="CanvasLayer" type="CanvasLayer"]
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -40.0
+offset_bottom = 40.0
+grow_horizontal = 0
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+script = ExtResource("1_tpm4m")
+
+[node name="Title" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Schmove Debugger"
+
+[node name="Jail" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Jail: Awaiting Refresh"
+label_settings = SubResource("LabelSettings_n3e6v")
+
+[node name="Exporters" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Exporters: Awaiting Refresh"
+label_settings = SubResource("LabelSettings_n3e6v")
+autowrap_mode = 1
+
+[node name="Importers" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Importers: Awaiting Refresh"
+label_settings = SubResource("LabelSettings_n3e6v")
+autowrap_mode = 1
+
+[node name="Refresh" type="Button" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Refresh"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="LineEdit" type="LineEdit" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+placeholder_text = "Target Name"
+
+[node name="Actions" type="HBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Jail" type="Button" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/Actions"]
+layout_mode = 2
+text = "Jail"
+
+[node name="Jail2" type="Button" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/Actions"]
+layout_mode = 2
+text = "Free"
+
+[node name="Jail3" type="Button" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/Actions"]
+layout_mode = 2
+text = "Destroy"
