@@ -5,4 +5,3 @@
 [resource]
 shader = ExtResource("1_vowam")
 shader_parameter/progress = 0.0
-shader_parameter/blackout = Vector4(0, 0, 0, 1)
