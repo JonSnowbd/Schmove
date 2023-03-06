@@ -1,23 +1,30 @@
-[gd_scene load_steps=3 format=3 uid="uid://bwhhqrhm3x7k6"]
+[gd_scene load_steps=2 format=3 uid="uid://bwhhqrhm3x7k6"]
 
-[ext_resource type="Script" path="res://addons/schmove/debugger.gd" id="1_tpm4m"]
+[ext_resource type="Script" path="res://addons/schmove/script/schmove_exporter_2d.gd.gd" id="1_7xef6"]
 
-[sub_resource type="LabelSettings" id="LabelSettings_n3e6v"]
-font_size = 10
+[node name="SchmoveDebugger" type="Window"]
+gui_embed_subwindows = true
+title = "Schmove Debugger"
+position = Vector2i(40, 40)
+size = Vector2i(458, 300)
+mode = 2
+exclusive = true
+always_on_top = true
+popup_window = true
+extend_to_title = true
+min_size = Vector2i(300, 200)
 
-[node name="CanvasLayer" type="CanvasLayer"]
+[node name="SchmoveExporter2D" type="Node" parent="."]
+script = ExtResource("1_7xef6")
+Group = 0
+Nickname = "schmove_debug"
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
-anchors_preset = 1
-anchor_left = 1.0
+anchors_preset = 15
 anchor_right = 1.0
-offset_left = -40.0
-offset_bottom = 40.0
-grow_horizontal = 0
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="MarginContainer"]
 layout_mode = 2
@@ -32,51 +39,59 @@ theme_override_constants/margin_bottom = 8
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer"]
 layout_mode = 2
 theme_override_constants/separation = 8
-script = ExtResource("1_tpm4m")
 
-[node name="Title" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="Log" type="PanelContainer" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
-text = "Schmove Debugger"
+size_flags_vertical = 3
 
-[node name="Jail" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer"]
-layout_mode = 2
-text = "Jail: Awaiting Refresh"
-label_settings = SubResource("LabelSettings_n3e6v")
-
-[node name="Exporters" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer"]
-layout_mode = 2
-text = "Exporters: Awaiting Refresh"
-label_settings = SubResource("LabelSettings_n3e6v")
-autowrap_mode = 1
-
-[node name="Importers" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer"]
-layout_mode = 2
-text = "Importers: Awaiting Refresh"
-label_settings = SubResource("LabelSettings_n3e6v")
-autowrap_mode = 1
-
-[node name="Refresh" type="Button" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer"]
-layout_mode = 2
-text = "Refresh"
-
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="Scroll" type="ScrollContainer" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/Log"]
 layout_mode = 2
 
-[node name="LineEdit" type="LineEdit" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer"]
+[node name="Padding" type="MarginContainer" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/Log/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+
+[node name="LogBox" type="VBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/Log/Scroll/Padding"]
+layout_mode = 2
+
+[node name="Prototype" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/Log/Scroll/Padding/LogBox"]
+layout_mode = 2
+text = "Jailed a new entity, it looked pretty painful honestly why"
+clip_text = true
+text_overrun_behavior = 3
+
+[node name="Toybox" type="VBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Target" type="LineEdit" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/Toybox"]
 layout_mode = 2
 placeholder_text = "Target Name"
+caret_blink = true
+caret_blink_interval = 0.5
 
-[node name="Actions" type="HBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer"]
+[node name="Keyword" type="LineEdit" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/Toybox"]
+layout_mode = 2
+placeholder_text = "Jail Keyword"
+caret_blink = true
+caret_blink_interval = 0.5
+
+[node name="Actions" type="HBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/Toybox"]
 layout_mode = 2
 
-[node name="Jail" type="Button" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/Actions"]
+[node name="Jail" type="Button" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/Toybox/Actions"]
 layout_mode = 2
-text = "Jail"
+text = "Jail "
 
-[node name="Jail2" type="Button" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/Actions"]
+[node name="Jail2" type="Button" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/Toybox/Actions"]
 layout_mode = 2
-text = "Free"
+text = "Release"
 
-[node name="Jail3" type="Button" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/Actions"]
+[node name="Jail3" type="Button" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/Toybox/Actions"]
 layout_mode = 2
-text = "Destroy"
+text = "Launch"
+
+[node name="Jail4" type="Button" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/Toybox/Actions"]
+layout_mode = 2
+text = "Launch from Jail"

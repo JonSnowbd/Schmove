@@ -5,7 +5,6 @@ extends Container
 @onready var export_list: Label = $Exporters
 @onready var import_list: Label = $Importers
 @onready var refresh: Button = $Refresh
-@onready var 
 
 
 func _ready():
