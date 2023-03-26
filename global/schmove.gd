@@ -7,10 +7,29 @@ signal Logged(message: String, log_type: int)
 
 const WipeCircle = preload("res://addons/schmove/material/circle_wipe.tres")
 const WipeStickGlitch = preload("res://addons/schmove/material/stick_wipe.tres")
+const ExporterGroup = "schmove_exporters"
+const ImporterGroup = "schmove_importers"
+const StaticGroup = "schmove_statics"
 
 var _preloaded: Dictionary = {}
 var _launched: Array[SchmoveExporter2D] = []
-var _jail: Dictionary = {}
+var _average_delta: Array[float] = []
+
+var state: Dictionary = {
+	"level": "",
+	"data": {},
+	"static_data": {},
+	"jail": {},
+}
+
+func _ready():
+	_average_delta.append(1.0/60.0)
+func _process(delta):
+	var scale = ProjectSettings.get_setting("application/schmove/time_mush", 0.1)
+	if Engine.time_scale > scale and !$Curtain._running:
+		_average_delta.append(delta)
+		if len(_average_delta) > 10:
+			_average_delta.pop_front()
 
 ## If the target is a SchmoveExporter2D then the parent will be returned
 ## but if it isnt, then the node itself is returned. Used for convenience
@@ -50,40 +69,45 @@ var _t_launched: Array[SchmoveExporter2D] = []
 var _t_keyword: String = ""
 var _t_using_wipe: bool = false
 var _t_shuffle: bool = false
+var _t_stamp = 0
 
+
+func _get_average_delta():
+	var d = 0.0
+	for delt in _average_delta:
+		d+=delt
+	return d / len(_average_delta)
 func _emit_transition():
 	DeferredSceneTransition.emit()
 
-
-func _get_all_exporters(node: Node, depth: int = 0) -> Array[SchmoveExporter2D]:
-	var max_depth = ProjectSettings.get_setting("application/schmove/search_depth", 2)
-	if depth > max_depth:
-		return []
+func _get_all_statics_in_tree() -> Array[SchmoveStatic2D]:
+	var nodes =  get_tree().get_nodes_in_group(StaticGroup)
+	var statics: Array[SchmoveStatic2D] = []
+	for x in nodes:
+		if x is SchmoveStatic2D:
+			statics.append(x as SchmoveStatic2D)
+	return statics
+func _get_all_exporters_in_tree() -> Array[SchmoveExporter2D]:
+	var nodes =  get_tree().get_nodes_in_group(ExporterGroup)
 	var exports: Array[SchmoveExporter2D] = []
-	if node is SchmoveExporter2D:
-		exports.append(node)
-	else:
-		for c in node.get_children():
-			exports.append_array(_get_all_exporters(c, depth+1))
+	for x in nodes:
+		if x is SchmoveExporter2D:
+			exports.append(x as SchmoveExporter2D)
 	return exports
-
-func _get_all_importers(node: Node, depth: int = 0) -> Array[SchmoveImporter2D]:
-	var max_depth = ProjectSettings.get_setting("application/schmove/search_depth", 2)
-	if depth > max_depth:
-		return []
-	var exports: Array[SchmoveImporter2D] = []
-	if node is SchmoveImporter2D:
-		exports.append(node)
-	else:
-		for c in node.get_children():
-			exports.append_array(_get_all_importers(c, depth+1))
-	return exports
+func _get_all_importers_in_tree() -> Array[SchmoveImporter2D]:
+	var nodes =  get_tree().get_nodes_in_group(ImporterGroup)
+	var imports: Array[SchmoveImporter2D] = []
+	for x in nodes:
+		if x is SchmoveImporter2D:
+			imports.append(x as SchmoveImporter2D)
+	return imports
 
 ## Schmove transitions are like a state machine, or imgui if you've used it.
 ## Begin a transition, use transition_* methods to customize, then finish
 ## with finish_transition or cancel with cancel_transition
 func begin_transition(new_level_path: String):
 	_t_level = new_level_path
+	state["level"] = new_level_path
 	StateUpdated.emit()
 
 ## Importers can be locked behind a keyword. A target import slot is used only if
@@ -108,27 +132,77 @@ func transition_launch(target: Node):
 	print("SCHMOVE: Failed to launch "+target.name+" as we could not find a SchmoveExporter2D in the children, and it itself is not a SchmoveExporter2D.")
 
 ## Launches every node that is in the given jail keyword. If you called Schmove.jail_node(x, "party")
-## you can launch everything in that "party" word with this.
+## you can launch everything in that "party" word with Schmove.transition_launch_jail("party")
 func transition_launch_jail(keyword = ""):
-	if _jail.has(keyword):
-		for n in _jail[keyword]:
+	if state["jail"].has(keyword):
+		for n in state["jail"][keyword]:
 			_t_launched.append(n)
-		_jail[keyword].clear()
+		state["jail"][keyword].clear()
 		StateUpdated.emit()
 
 ## Semi expensive depending on scene depth, launches every node that has the given nickname.
 func transition_launch_by_name(name: String):
-	var scene = get_tree().current_scene
-	var exporters = _get_all_exporters(scene)
+	var exporters = _get_all_exporters_in_tree()
+	var count = 0
 	for ex in exporters:
 		if ex.Nickname == name:
-			print("Launching via nickname")
+			count += 1
 			transition_launch(ex)
 	StateUpdated.emit()
+	Logged.emit("Launch request '%s' finished, affected %s units" % [name, str(count)], 0)
 
 func transition_shuffle():
 	_t_shuffle = true
 	StateUpdated.emit()
+
+func save_state(user_path: String):
+	var _j: Dictionary = state["jail"]
+	for kw in _j.keys():
+		for exp in _j[kw]:
+			if exp is SchmoveExporter2D:
+				if exp.Nickname != "" and !exp.IgnoreOnSave:
+					exp.push_state()
+					state["data"][exp.Nickname]["__jailed"] = kw
+	var exporters = _get_all_exporters_in_tree()
+	for exp in exporters:
+		if exp.Nickname != "" and !exp.IgnoreOnSave:
+			exp.push_state()
+	var final_data = {
+		"data": state["data"],
+		"level": state["level"],
+		"static_data": state["static_data"]
+	}
+	var f = FileAccess.open(user_path, FileAccess.WRITE)
+	if f == null:
+		push_error("Failed to open %s, error #%s" % [user_path, FileAccess.get_open_error()])
+		return
+	f.store_var(final_data, true)
+
+func load_state(user_path: String):
+	var f = FileAccess.open(user_path, FileAccess.READ)
+	if f == null:
+		push_error("Failed to open %s, error #%s" % [user_path, FileAccess.get_open_error()])
+		return
+	var dict: Dictionary = f.get_var(true)
+	var level = load(dict["level"])
+	get_tree().change_scene_to_packed(level)
+	await get_tree().process_frame
+	
+	state = {
+		"jail": {},
+		"level": dict["level"],
+		"data": dict["data"],
+		"static_data": dict["static_data"]
+	}
+	for kw in dict["data"].keys():
+		print(dict["data"][kw])
+		if dict["data"][kw].has("__prefab"):
+			var prefab = load(dict["data"][kw]["__prefab"])
+			var instance = prefab.instantiate()
+			get_tree().current_scene.add_child(instance)
+			var exporter = get_exporter_node(instance)
+			if exporter is SchmoveExporter2D:
+				exporter.pull_state()
 
 func transition_wipe(shader: ShaderMaterial, duration: float):
 	var tex: Image = get_viewport().get_texture().get_image()
@@ -140,7 +214,7 @@ func transition_wipe(shader: ShaderMaterial, duration: float):
 ## Begin a transition, use transition_* methods to customize, then finish
 ## with finish_transition or cancel with cancel_transition
 func finish_transition():
-	var start_stamp = Time.get_ticks_msec()
+	_t_stamp = Time.get_ticks_msec()
 		
 	if _t_using_wipe:
 		$Curtain.run_transition()
@@ -154,13 +228,13 @@ func finish_transition():
 		target_level = _preloaded[_t_level]
 	else:
 		target_level = load(_t_level)
-	
-	var target_instance = target_level.instantiate()
-	var old_instance = get_tree().current_scene
-	
-	var exporter_list = _get_all_exporters(old_instance)
-	var importer_list = _get_all_importers(target_instance)
-	
+		
+	# Sync all the static states before we move over.
+	var static_list = _get_all_statics_in_tree()
+	for stc in static_list:
+		stc.push_state()
+
+	var exporter_list = _get_all_exporters_in_tree()
 	for exporter in exporter_list:
 		if exporter.Important == SchmoveExporter2D.ImportanceType.None:
 			continue
@@ -170,48 +244,7 @@ func finish_transition():
 			if exporter.Important == SchmoveExporter2D.ImportanceType.Jail:
 				jail_node(exporter, "schmove_limbo")
 	
-	if _t_shuffle:
-		importer_list.shuffle()
-		_t_launched.shuffle()
-	
-	# Find the launchers a home
-	for launched in _t_launched:
-		# ungrouped nodes are just brought over with no modification.
-		if launched.Group == 0:
-			print("inserting "+launched.get_parent().name)
-			var real = get_real_node(launched)
-			target_instance.add_child(real)
-			launched.call_deferred("_emit_transport")
-			continue
-		var found = false
-		for importer in importer_list:
-			if importer.is_compatible(launched):
-				var target_destination
-				if importer.TargetInsertionPath != null:
-					target_destination = importer.get_node(importer.TargetInsertionPath)
-				else:
-					target_destination = importer.get_parent()
-				var real = get_real_node(launched)
-				target_destination.add_child(real)
-				real.set_deferred("global_position", importer.global_position)
-				importer._consumed = true
-				found = true
-				launched.call_deferred("_emit_transport")
-				break
-		if !found:
-			jail_node(launched, "schmove_limbo")
-			print("SCHMOVE: Failed to find a suitable home for <"+launched.Nickname+">, sent to jail.")
-	
-	get_tree().root.call_deferred("add_child", target_instance)
-	get_tree().set_deferred("current_scene", target_instance)
-	call_deferred("_emit_transition")
-	old_instance.queue_free()
-	
-	# Then use cancel to clear the statemachine.
-	cancel_transition()
-	
-	var end_stamp = Time.get_ticks_msec()
-	print("SCHMOVE: Successful transition, took "+str(end_stamp-start_stamp)+"ms.")
+	get_tree().change_scene_to_packed(target_level)
 
 ## Schmove transitions are like a state machine, or imgui if you've used it.
 ## Begin a transition, use transition_* methods to customize, then finish
@@ -222,24 +255,31 @@ func cancel_transition():
 	_t_keyword = ""
 	_t_using_wipe = false
 	_t_shuffle = false
+	_t_stamp = 0
+	StateUpdated.emit()
 
 ## Removes a node from the tree, outside of any scene, temporarily stored until
 ## you want to do something with it, eg kill it, restore it, or transition it
 func jail_node(target: Node, keyword: String = ""):
 	var real_node: Node = get_real_node(target)
 	var exporter = get_exporter_node(target)
-	if !_jail.has(keyword):
-		_jail[keyword] = []
+	if !state["jail"].has(keyword):
+		state["jail"][keyword] = []
 	if real_node == null or exporter == null:
 		print("SCHMOVE: Jailed node did not have an exporter, or was not an exporter.")
 		return
-	real_node.get_parent().remove_child(real_node)
-	_jail[keyword].append(exporter as SchmoveExporter2D)
+	var parent = real_node.get_parent()
+	if parent != null:
+		parent.remove_child(real_node)
+	state["jail"][keyword].append(exporter as SchmoveExporter2D)
 	exporter.call_deferred("_emit_jailed")
+	Logged.emit("Jailed %s" % real_node.name, 0)
 
-## Semi expensive depending on scene search depth and how you layout your nodes
 func jail_by_name(name: String, keyword: String = ""):
-	var exporters = _get_all_exporters(get_tree().current_scene)
+	var exporters = _get_all_exporters_in_tree()
+	var count = 0
 	for exp in exporters:
 		if exp.Nickname == name:
+			count += 1
 			jail_node(exp, keyword)
+	Logged.emit("Jail request '%s' finished, affected %s units" % [name, str(count)], 0)

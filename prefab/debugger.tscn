@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://bwhhqrhm3x7k6"]
+[gd_scene load_steps=3 format=3 uid="uid://bwhhqrhm3x7k6"]
 
 [ext_resource type="Script" path="res://addons/schmove/script/schmove_exporter_2d.gd.gd" id="1_7xef6"]
+[ext_resource type="Script" path="res://addons/schmove/debugger.gd" id="2_yhlai"]
 
 [node name="SchmoveDebugger" type="Window"]
 gui_embed_subwindows = true
@@ -17,81 +18,119 @@ min_size = Vector2i(300, 200)
 [node name="SchmoveExporter2D" type="Node" parent="."]
 script = ExtResource("1_7xef6")
 Group = 0
+Important = 1
 Nickname = "schmove_debug"
+TargetPrefab = "res://addons/schmove/prefab/debugger.tscn"
+IgnoreOnSave = true
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="Container" type="PanelContainer" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("2_yhlai")
 
-[node name="PanelContainer" type="PanelContainer" parent="MarginContainer"]
-layout_mode = 2
-
-[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/PanelContainer"]
-layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
-
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer"]
+[node name="Split" type="VBoxContainer" parent="Container"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Log" type="PanelContainer" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="Tabs" type="TabContainer" parent="Container/Split"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Scroll" type="ScrollContainer" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/Log"]
+[node name="State" type="PanelContainer" parent="Container/Split/Tabs"]
 layout_mode = 2
 
-[node name="Padding" type="MarginContainer" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/Log/Scroll"]
+[node name="Tree" type="Tree" parent="Container/Split/Tabs/State"]
+layout_mode = 2
+scroll_horizontal_enabled = false
+
+[node name="Log" type="PanelContainer" parent="Container/Split/Tabs"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Scroll" type="ScrollContainer" parent="Container/Split/Tabs/Log"]
+layout_mode = 2
+horizontal_scroll_mode = 3
+
+[node name="Padding" type="MarginContainer" parent="Container/Split/Tabs/Log/Scroll"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_right = 8
 
-[node name="LogBox" type="VBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/Log/Scroll/Padding"]
+[node name="LogBox" type="VBoxContainer" parent="Container/Split/Tabs/Log/Scroll/Padding"]
 layout_mode = 2
 
-[node name="Prototype" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/Log/Scroll/Padding/LogBox"]
-layout_mode = 2
-text = "Jailed a new entity, it looked pretty painful honestly why"
-clip_text = true
-text_overrun_behavior = 3
-
-[node name="Toybox" type="VBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="Actions" type="PanelContainer" parent="Container/Split/Tabs"]
+visible = false
 layout_mode = 2
 
-[node name="Target" type="LineEdit" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/Toybox"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Container/Split/Tabs/Actions"]
 layout_mode = 2
+
+[node name="Save" type="Button" parent="Container/Split/Tabs/Actions/VBoxContainer"]
+layout_mode = 2
+text = "Save to debug.json"
+
+[node name="Load" type="Button" parent="Container/Split/Tabs/Actions/VBoxContainer"]
+layout_mode = 2
+text = "Load from debug.json"
+
+[node name="Toybox" type="VBoxContainer" parent="Container/Split"]
+layout_mode = 2
+
+[node name="Entries" type="HBoxContainer" parent="Container/Split/Toybox"]
+layout_mode = 2
+
+[node name="Target" type="LineEdit" parent="Container/Split/Toybox/Entries"]
+layout_mode = 2
+size_flags_horizontal = 3
 placeholder_text = "Target Name"
 caret_blink = true
 caret_blink_interval = 0.5
 
-[node name="Keyword" type="LineEdit" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/Toybox"]
+[node name="Keyword" type="LineEdit" parent="Container/Split/Toybox/Entries"]
 layout_mode = 2
+size_flags_horizontal = 3
 placeholder_text = "Jail Keyword"
 caret_blink = true
 caret_blink_interval = 0.5
 
-[node name="Actions" type="HBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/Toybox"]
+[node name="Actions" type="HBoxContainer" parent="Container/Split/Toybox"]
 layout_mode = 2
 
-[node name="Jail" type="Button" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/Toybox/Actions"]
+[node name="Jail" type="Button" parent="Container/Split/Toybox/Actions"]
 layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
 text = "Jail "
 
-[node name="Jail2" type="Button" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/Toybox/Actions"]
+[node name="Release" type="Button" parent="Container/Split/Toybox/Actions"]
 layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+disabled = true
 text = "Release"
 
-[node name="Jail3" type="Button" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/Toybox/Actions"]
+[node name="Launch" type="Button" parent="Container/Split/Toybox/Actions"]
 layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
 text = "Launch"
 
-[node name="Jail4" type="Button" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/Toybox/Actions"]
+[node name="Resync" type="Button" parent="Container/Split/Toybox/Actions"]
 layout_mode = 2
-text = "Launch from Jail"
+size_flags_horizontal = 3
+focus_mode = 0
+disabled = true
+text = "Sync States"
+
+[connection signal="pressed" from="Container/Split/Tabs/Actions/VBoxContainer/Save" to="Container" method="_on_save_pressed"]
+[connection signal="pressed" from="Container/Split/Tabs/Actions/VBoxContainer/Load" to="Container" method="_on_load_pressed"]
+[connection signal="pressed" from="Container/Split/Toybox/Actions/Jail" to="Container" method="_on_jail_pressed"]
+[connection signal="pressed" from="Container/Split/Toybox/Actions/Launch" to="Container" method="_on_launch_pressed"]

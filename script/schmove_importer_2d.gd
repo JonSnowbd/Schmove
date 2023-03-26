@@ -14,9 +14,12 @@ class_name SchmoveImporter2D
 
 ## Used to filter out what exporters can be brought into this slot.
 ## If 0, nothing can be brought in
-@export_flags_3d_navigation var AllowsGroups = 1
+@export var AllowsGroups = 0
 
 var _consumed: bool = false
+
+func _init():
+	add_to_group(Schmove.ImporterGroup, true)
 
 func is_compatible(target: Node, keyword: String = "") -> bool:
 	if _consumed:

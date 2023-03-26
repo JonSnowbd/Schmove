@@ -1,0 +1,107 @@
+[gd_scene load_steps=3 format=3 uid="uid://vb5i2dfvhjon"]
+
+[ext_resource type="Theme" uid="uid://beixim30xfa2d" path="res://addons/schmove/editor_script/theme.tres" id="1_7mway"]
+[ext_resource type="Script" path="res://addons/schmove/editor_script/group_editor_widget.gd" id="1_txs3h"]
+
+[node name="EditGroupWidget" type="VBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_7mway")
+script = ExtResource("1_txs3h")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 2
+text = "Label"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Flow" type="HFlowContainer" parent="."]
+layout_mode = 2
+alignment = 1
+
+[node name="GroupCheck1" type="PanelContainer" parent="Flow"]
+layout_mode = 2
+
+[node name="CheckBox" type="CheckBox" parent="Flow/GroupCheck1"]
+layout_mode = 2
+focus_mode = 0
+
+[node name="GroupCheck2" type="PanelContainer" parent="Flow"]
+layout_mode = 2
+
+[node name="CheckBox" type="CheckBox" parent="Flow/GroupCheck2"]
+layout_mode = 2
+focus_mode = 0
+
+[node name="GroupCheck3" type="PanelContainer" parent="Flow"]
+layout_mode = 2
+
+[node name="CheckBox" type="CheckBox" parent="Flow/GroupCheck3"]
+layout_mode = 2
+focus_mode = 0
+
+[node name="GroupCheck4" type="PanelContainer" parent="Flow"]
+layout_mode = 2
+
+[node name="CheckBox" type="CheckBox" parent="Flow/GroupCheck4"]
+layout_mode = 2
+focus_mode = 0
+
+[node name="GroupCheck5" type="PanelContainer" parent="Flow"]
+layout_mode = 2
+
+[node name="CheckBox" type="CheckBox" parent="Flow/GroupCheck5"]
+layout_mode = 2
+focus_mode = 0
+
+[node name="GroupCheck6" type="PanelContainer" parent="Flow"]
+layout_mode = 2
+
+[node name="CheckBox" type="CheckBox" parent="Flow/GroupCheck6"]
+layout_mode = 2
+focus_mode = 0
+
+[node name="GroupCheck7" type="PanelContainer" parent="Flow"]
+layout_mode = 2
+
+[node name="CheckBox" type="CheckBox" parent="Flow/GroupCheck7"]
+layout_mode = 2
+focus_mode = 0
+
+[node name="GroupCheck8" type="PanelContainer" parent="Flow"]
+layout_mode = 2
+
+[node name="CheckBox" type="CheckBox" parent="Flow/GroupCheck8"]
+layout_mode = 2
+focus_mode = 0
+
+[node name="GroupCheck9" type="PanelContainer" parent="Flow"]
+layout_mode = 2
+
+[node name="CheckBox" type="CheckBox" parent="Flow/GroupCheck9"]
+layout_mode = 2
+focus_mode = 0
+
+[node name="GroupCheck10" type="PanelContainer" parent="Flow"]
+layout_mode = 2
+
+[node name="CheckBox" type="CheckBox" parent="Flow/GroupCheck10"]
+layout_mode = 2
+focus_mode = 0
+
+[node name="GroupCheck11" type="PanelContainer" parent="Flow"]
+layout_mode = 2
+
+[node name="CheckBox" type="CheckBox" parent="Flow/GroupCheck11"]
+layout_mode = 2
+focus_mode = 0
+
+[node name="GroupCheck12" type="PanelContainer" parent="Flow"]
+layout_mode = 2
+
+[node name="CheckBox" type="CheckBox" parent="Flow/GroupCheck12"]
+layout_mode = 2
+focus_mode = 0

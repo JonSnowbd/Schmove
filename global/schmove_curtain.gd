@@ -22,17 +22,20 @@ func run_transition():
 	_running = true
 	
 func _process(delta):
+	var should_mush = ProjectSettings.get_setting("application/schmove/time_mush_on_wipe_transition", true)
 	if _running:
-		_timer -= delta
+		_timer -= Schmove._get_average_delta()
 		var prog = 1.0-(_timer / _dur)
+		if should_mush:
+			var mush = ProjectSettings.get_setting("application/schmove/time_mush", 0.1)
+			Engine.time_scale = lerp(mush, _scale, prog)
 		$TextureRect.material.set_shader_parameter("progress", prog)
-		#var tail_value = clamp((1.0 - (0.5/theta)) * 2.0, 0.0, 1.0)
-		
+	
 	if _running and _timer <= 0.0:
 		visible = false
 		_running = false
 		_dur = -1.0
 		_timer = -1.0
-		#Engine.time_scale = _scale
+		Engine.time_scale = _scale
 		$TextureRect.texture = null
 		return
